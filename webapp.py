@@ -16,15 +16,19 @@ engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}:5432
 def get_data():
     # Gemiddelde aantal reviews per dag per stad in 2023
 
-    df = pd.read_csv(
-        r"C:\Users\WouterVersteeghVFTal\repos\Deliverable\team_projects\Wouter\Streamlit_Webapp\city_review_data.csv"
+    df = pd.read_sql_query(
+        """
+    SELECT res.colophon_data_city as city, rev.datetime::DATE as date, COUNT(*) as review_count
+    FROM reviews rev inner join restaurants res on
+    res.restaurant_id = rev.restaurant_id
+    where res.colophon_data_city in ('Amsterdam','Rotterdam','Groningen')
+    and EXTRACT(year from rev.datetime) = 2023
+    GROUP BY res.colophon_data_city , date
+                           """,
+        con=engine,
     )
-    try:
-        df = df.drop(columns=["Unnamed: 0"])
 
-        df["date"] = pd.to_datetime(df["date"])
-    except KeyError:
-        pass
+    df["date"] = pd.to_datetime(df["date"])
     return df
 
 
