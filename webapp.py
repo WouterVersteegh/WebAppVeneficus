@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 import streamlit as st
+import sqlalchemy
 from sqlalchemy import create_engine
 
 DB_USER = "deliverable_taskforce"
